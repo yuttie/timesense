@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Time Sense</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment/moment.js"></script>
+    <script>
+      const dataset = [];
+    </script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        overflow-x: hidden;
+      }
+      #app {
+        text-align: center;
+        padding: 2em;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <clock id="clock"></clock>
+      <svg viewBox="-1 -1 2 2">
+        <g id="debug">
+          <circle cx="-1.0" cy="-1.0" r="0.02" fill="black" />
+          <circle cx="-0.5" cy="-1.0" r="0.02" fill="black" />
+          <circle cx="0.0"  cy="-1.0" r="0.02" fill="black" />
+          <circle cx="0.5"  cy="-1.0" r="0.02" fill="black" />
+          <circle cx="1.0"  cy="-1.0" r="0.02" fill="black" />
+
+          <circle cx="-1.0" cy="-0.5" r="0.02" fill="black" />
+          <circle cx="-0.5" cy="-0.5" r="0.02" fill="black" />
+          <circle cx="0.0"  cy="-0.5" r="0.02" fill="black" />
+          <circle cx="0.5"  cy="-0.5" r="0.02" fill="black" />
+          <circle cx="1.0"  cy="-0.5" r="0.02" fill="black" />
+
+          <circle cx="-1.0" cy="0.0"  r="0.02" fill="black" />
+          <circle cx="-0.5" cy="0.0"  r="0.02" fill="black" />
+          <circle cx="0.0"  cy="0.0"  r="0.02" fill="red" />
+          <circle cx="0.5"  cy="0.0"  r="0.02" fill="black" />
+          <circle cx="1.0"  cy="0.0"  r="0.02" fill="black" />
+
+          <circle cx="-1.0" cy="0.5"  r="0.02" fill="black" />
+          <circle cx="-0.5" cy="0.5"  r="0.02" fill="black" />
+          <circle cx="0.0"  cy="0.5"  r="0.02" fill="black" />
+          <circle cx="0.5"  cy="0.5"  r="0.02" fill="black" />
+          <circle cx="1.0"  cy="0.5"  r="0.02" fill="black" />
+
+          <circle cx="-1.0" cy="1.0"  r="0.02" fill="black" />
+          <circle cx="-0.5" cy="1.0"  r="0.02" fill="black" />
+          <circle cx="0.0"  cy="1.0"  r="0.02" fill="black" />
+          <circle cx="0.5"  cy="1.0"  r="0.02" fill="black" />
+          <circle cx="1.0"  cy="1.0"  r="0.02" fill="black" />
+        </g>
+
+        <manager id="manager"/>
+      </svg>
+    </div>
+    <script>
+      Vue.component('clock', {
+        data: function() {
+          return {
+            now: '',
+          }
+        },
+        mounted: function() {
+          requestAnimationFrame(this.tick);
+        },
+        methods: {
+          tick: function() {
+            this.now = moment();
+            requestAnimationFrame(this.tick);
+          },
+        },
+        template: `
+          <div>
+            <span>{{ now }}</span>
+          </div>
+        `,
+      });
+
+      Vue.component('manager', {
+        data: function() {
+          return {
+            arcs: [
+              { value: 0, r1: 0.1, r2: 0.15},
+              { value: 0, r1: 0.2, r2: 0.3},
+              { value: 0, r1: 0.4, r2: 0.55},
+              { value: 0, r1: 0.7, r2: 0.9},
+            ],
+          };
+        },
+        mounted: function() {
+          requestAnimationFrame(this.tick);
+        },
+        methods: {
+          tick: function() {
+            const now = moment();
+
+            this.arcs[0].value = ((now.valueOf() / 1000) % 2) / 2;
+            this.arcs[1].value = ((now.valueOf() / 1000) % 3) / 3;
+            this.arcs[2].value = ((now.valueOf() / 1000) % 5) / 5;
+            this.arcs[3].value = ((now.valueOf() / 1000) % 7) / 7;
+
+            requestAnimationFrame(this.tick);
+          }
+        },
+        template: `
+          <g>
+            <arc
+              v-for="(arc, i) in arcs"
+              v-bind:key="i"
+              v-bind:value="arc.value"
+              v-bind:r1="arc.r1"
+              v-bind:r2="arc.r2"/>
+          </g>
+        `,
+      });
+
+      Vue.component('arc', {
+        props: [
+          'value',
+          'r1',
+          'r2',
+        ],
+        computed: {
+          radius: function() {
+            return (this.r1 + this.r2) / 2;
+          },
+          width: function() {
+            return this.r2 - this.r1;
+          },
+          dasharray: function() {
+            const circumference = 2 * Math.PI * this.radius;
+            return `${circumference * this.value} ${circumference}`;
+          },
+        },
+        template: `
+          <circle
+            cx="0"
+            cy="0"
+            v-bind:r="radius"
+            fill="transparent"
+            stroke="tomato"
+            v-bind:stroke-width="width"
+            stroke-opacity="0.5"
+            v-bind:stroke-dasharray="dasharray"
+            transform="rotate(-90)"/>
+        `,
+      });
+
+      const app = new Vue({ el: '#app' });
+    </script>
+  </body>
+</html>
