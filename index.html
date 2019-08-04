@@ -37,11 +37,15 @@
       #app svg {
         height: 100%;
       }
+
+      #app #clock {
+        font: serif;
+        font-size: 0.1px;
+      }
     </style>
   </head>
   <body>
     <div id="app">
-      <clock id="clock"></clock>
       <svg viewBox="-1 -1 2 2">
         <g id="debug">
           <circle cx="-1.0" cy="-1.0" r="0.02" fill="black" />
@@ -75,6 +79,7 @@
           <circle cx="1.0"  cy="1.0"  r="0.02" fill="black" />
         </g>
 
+        <clock id="clock"/>
         <manager id="manager"/>
       </svg>
     </div>
@@ -95,9 +100,7 @@
           },
         },
         template: `
-          <div>
-            <span>{{ now }}</span>
-          </div>
+          <text x="0" y="0" text-anchor="middle">{{ now }}</text>
         `,
       });
 
