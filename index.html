@@ -47,6 +47,19 @@
   <body>
     <div id="app">
       <svg viewBox="-1 -1 2 2">
+        <defs>
+          <filter id="drop-shadow">
+            <feGaussianBlur in="SourceAlpha" stdDeviation="0.02"/>
+            <feOffset dx="0" dy="0" result="offsetblur"/>
+            <feComponentTransfer>
+              <feFuncA type="linear" slope="0.5"/>
+            </feComponentTransfer>
+            <feMerge>
+              <feMergeNode/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+        </defs>
         <g id="debug">
           <circle cx="-1.0" cy="-1.0" r="0.02" fill="black" />
           <circle cx="-0.5" cy="-1.0" r="0.02" fill="black" />
@@ -131,7 +144,9 @@
           }
         },
         template: `
-          <g>
+          <g
+            filter="url(#drop-shadow)"
+            >
             <arc
               v-for="(arc, i) in arcs"
               v-bind:key="i"
