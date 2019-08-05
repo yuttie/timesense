@@ -149,28 +149,31 @@
           'r2',
         ],
         computed: {
-          radius: function() {
-            return (this.r1 + this.r2) / 2;
-          },
-          width: function() {
-            return this.r2 - this.r1;
-          },
-          dasharray: function() {
-            const circumference = 2 * Math.PI * this.radius;
-            return `${circumference * this.value} ${circumference}`;
+          d: function() {
+            const t1 = 0;
+            const t2 = 2 * Math.PI * this.value;
+            const large_arc_flag = this.value > 0.5 ? 1 : 0;
+            const x_i1 =  this.r1 * Math.sin(t1);
+            const y_i1 = -this.r1 * Math.cos(t1);
+            const x_i2 =  this.r1 * Math.sin(t2);
+            const y_i2 = -this.r1 * Math.cos(t2);
+            const x_o2 =  this.r2 * Math.sin(t2);
+            const y_o2 = -this.r2 * Math.cos(t2);
+            const x_o1 =  this.r2 * Math.sin(t1);
+            const y_o1 = -this.r2 * Math.cos(t1);
+            return `M ${x_i1} ${y_i1}
+                    A ${this.r1} ${this.r1} 0 ${large_arc_flag} 1 ${x_i2} ${y_i2}
+                    L ${x_o2} ${y_o2}
+                    A ${this.r2} ${this.r2} 0 ${large_arc_flag} 0 ${x_o1} ${y_o1}
+                    L ${x_i1} ${y_i1}`;
           },
         },
         template: `
-          <circle
-            cx="0"
-            cy="0"
-            v-bind:r="radius"
-            fill="transparent"
-            stroke="tomato"
-            v-bind:stroke-width="width"
-            stroke-opacity="0.5"
-            v-bind:stroke-dasharray="dasharray"
-            transform="rotate(-90)"/>
+          <path
+            v-bind:d="d"
+            fill="tomato"
+            fill-opacity="0.5"
+            />
         `,
       });
 
