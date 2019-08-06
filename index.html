@@ -141,8 +141,8 @@
             const arcs = [];
 
             for (const [i, period] of this.periods.entries()) {
-              const startTime = moment(period['start']);
-              const endTime = moment(period['end']);
+              const startTime = moment(period.start);
+              const endTime = moment(period.end);
               const value = (this.now - startTime) / (endTime - startTime);
               const r1 = 1 - i * (0.1 + 0.05) - 0.1;
               const r2 = r1 + 0.1;
