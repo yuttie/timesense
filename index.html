@@ -100,7 +100,7 @@
       Vue.component('clock', {
         data: function() {
           return {
-            now: '',
+            now: moment(),
           }
         },
         mounted: function() {
@@ -113,7 +113,10 @@
           },
         },
         template: `
-          <text x="0" y="0" text-anchor="middle">{{ now }}</text>
+          <text x="0" y="0" text-anchor="middle">
+            <tspan x="0" dy="0em">{{ now.format('YYYY-MM-DD') }}</tspan>
+            <tspan x="0" dy="1em">{{ now.format('hh:mm:ss') }}</tspan>
+          </text>
         `,
       });
 
