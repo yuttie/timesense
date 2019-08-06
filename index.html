@@ -125,11 +125,11 @@
           return {
             now: moment(),
             periods: [
-              { start: '2019-08-06 00:00', end: '2019-08-07 00:00' },
-              { start: '2019-08-06 00:00', end: '2019-08-06 12:00' },
-              { start: '2019-08-06 09:00', end: '2019-08-06 10:00' },
-              { start: '2019-08-06 09:10', end: '2019-08-06 09:20' },
-              { start: '2019-08-06 09:11', end: '2019-08-06 09:12' },
+              { start: '2019-08-06 00:00', end: '2019-08-07 00:00', label: 'This Day' },
+              { start: '2019-08-06 00:00', end: '2019-08-06 12:00', label: 'This Morning' },
+              { start: '2019-08-06 09:00', end: '2019-08-06 10:00', label: 'This Hour' },
+              { start: '2019-08-06 09:10', end: '2019-08-06 09:20', label: 'This 10-minutes' },
+              { start: '2019-08-06 09:11', end: '2019-08-06 09:12', label: 'This 1-minute' },
             ],
           };
         },
@@ -143,14 +143,23 @@
             let w = 0.1;
             let s = 0.05;
             let r2 = 0.95;
+            let fontSize = 0.1;
             for (const [i, period] of this.periods.entries()) {
               const startTime = moment(period.start);
               const endTime = moment(period.end);
               const value = (this.now - startTime) / (endTime - startTime);
               const r1 = r2 - w;
-              arcs.push({ value: value, r1: r1, r2: r2 });
+              arcs.push({
+                value: value,
+                r1: r1,
+                r2: r2,
+                fontSize: fontSize,
+                pathId: `path-${i}`,
+                label: period.label,
+              });
 
               r2 = r1 - s;
+              fontSize *= 0.8;
               w *= 0.8;
               s *= 0.8;
             }
@@ -171,7 +180,11 @@
               v-bind:key="i"
               v-bind:value="arc.value"
               v-bind:r1="arc.r1"
-              v-bind:r2="arc.r2"/>
+              v-bind:r2="arc.r2"
+              v-bind:font-size="arc.fontSize"
+              v-bind:path-id="arc.pathId"
+              v-bind:label="arc.label"
+              />
           </g>
         `,
       });
@@ -181,8 +194,14 @@
           'value',
           'r1',
           'r2',
+          'font-size',
+          'path-id',
+          'label',
         ],
         computed: {
+          pathIdRef: function() {
+            return '#' + this.pathId;
+          },
           d: function() {
             const value = Math.max(0, Math.min(0.99999, this.value));
             const t1 = 0;
@@ -204,11 +223,19 @@
           },
         },
         template: `
-          <path
-            v-bind:d="d"
-            fill="tomato"
-            fill-opacity="0.5"
-            />
+          <g>
+            <path
+              v-bind:d="d"
+              v-bind:id="pathId"
+              fill="tomato"
+              fill-opacity="0.5"
+              />
+            <text dx="0.1em" dy="-0.1em" v-bind:font-size="fontSize">
+              <textPath v-bind:href="pathIdRef">
+                {{ label }}
+              </textPath>
+            </text>
+          </g>
         `,
       });
 
