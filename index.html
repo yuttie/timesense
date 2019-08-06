@@ -126,11 +126,10 @@
           return {
             now: moment(),
             periods: [
-              { start: '2019-08-06 00:00', end: '2019-08-07 00:00', label: 'This Day' },
-              { start: '2019-08-06 00:00', end: '2019-08-06 12:00', label: 'This Morning' },
-              { start: '2019-08-06 09:00', end: '2019-08-06 10:00', label: 'This Hour' },
-              { start: '2019-08-06 09:10', end: '2019-08-06 09:20', label: 'This 10-minutes' },
-              { start: '2019-08-06 09:11', end: '2019-08-06 09:12', label: 'This 1-minute' },
+              { start: '2019-01-01 00:00', end: '2019-01-01 00:00', label: 'This Day' },
+              { start: '2019-01-01 00:00', end: '2019-01-01 00:00', label: 'This Hour' },
+              { start: '2019-01-01 00:00', end: '2019-01-01 00:00', label: 'This 10-minutes' },
+              { start: '2019-01-01 00:00', end: '2019-01-01 00:00', label: 'This 1-minute' },
             ],
           };
         },
@@ -174,6 +173,35 @@
           },
           tick: function() {
             this.now = moment();
+
+            if (this.now.isAfter(this.periods[0].end)) {
+              const startTime = this.now.clone().startOf('day');
+              const endTime = startTime.clone().add(1, 'day');
+              this.periods[0].start = startTime.format();
+              this.periods[0].end = endTime.format();
+            }
+
+            if (this.now.isAfter(this.periods[1].end)) {
+              const startTime = this.now.clone().startOf('hour');
+              const endTime = startTime.clone().add(1, 'hour');
+              this.periods[1].start = startTime.format();
+              this.periods[1].end = endTime.format();
+            }
+
+            if (this.now.isAfter(this.periods[2].end)) {
+              const startTime = this.now.clone().startOf('hour').minutes(10 * Math.floor(this.now.minutes() / 10));
+              const endTime = startTime.clone().add(10, 'minutes');
+              this.periods[2].start = startTime.format();
+              this.periods[2].end = endTime.format();
+            }
+
+            if (this.now.isAfter(this.periods[3].end)) {
+              const startTime = this.now.clone().startOf('minute');
+              const endTime = startTime.clone().add(1, 'minute');
+              this.periods[3].start = startTime.format();
+              this.periods[3].end = endTime.format();
+            }
+
             requestAnimationFrame(this.tick);
           }
         },
