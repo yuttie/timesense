@@ -120,11 +120,13 @@
       Vue.component('manager', {
         data: function() {
           return {
-            arcs: [
-              { value: 0, r1: 0.1, r2: 0.15},
-              { value: 0, r1: 0.2, r2: 0.3},
-              { value: 0, r1: 0.4, r2: 0.55},
-              { value: 0, r1: 0.7, r2: 0.9},
+            now: moment(),
+            periods: [
+              { start: '2019-08-06 00:00', end: '2019-08-07 00:00' },
+              { start: '2019-08-06 00:00', end: '2019-08-06 12:00' },
+              { start: '2019-08-06 09:00', end: '2019-08-06 10:00' },
+              { start: '2019-08-06 09:10', end: '2019-08-06 09:20' },
+              { start: '2019-08-06 09:11', end: '2019-08-06 09:12' },
             ],
           };
         },
@@ -132,14 +134,22 @@
           requestAnimationFrame(this.tick);
         },
         methods: {
+          arcs: function() {
+            const arcs = [];
+
+            for (const [i, period] of this.periods.entries()) {
+              const startTime = moment(period['start']);
+              const endTime = moment(period['end']);
+              const value = (this.now - startTime) / (endTime - startTime);
+              const r1 = 1 - i * (0.1 + 0.05) - 0.1;
+              const r2 = r1 + 0.1;
+              arcs.push({ value: value, r1: r1, r2: r2 });
+            }
+
+            return arcs;
+          },
           tick: function() {
-            const now = moment();
-
-            this.arcs[0].value = ((now.valueOf() / 1000) % 2) / 2;
-            this.arcs[1].value = ((now.valueOf() / 1000) % 3) / 3;
-            this.arcs[2].value = ((now.valueOf() / 1000) % 5) / 5;
-            this.arcs[3].value = ((now.valueOf() / 1000) % 7) / 7;
-
+            this.now = moment();
             requestAnimationFrame(this.tick);
           }
         },
@@ -148,7 +158,7 @@
             filter="url(#drop-shadow)"
             >
             <arc
-              v-for="(arc, i) in arcs"
+              v-for="(arc, i) in arcs()"
               v-bind:key="i"
               v-bind:value="arc.value"
               v-bind:r1="arc.r1"
