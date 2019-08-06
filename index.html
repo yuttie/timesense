@@ -178,7 +178,7 @@
         ],
         computed: {
           d: function() {
-            const value = Math.max(0, Math.min(0.99999999, this.value));
+            const value = Math.max(0, Math.min(0.99999, this.value));
             const t1 = 0;
             const t2 = 2 * Math.PI * value;
             const large_arc_flag = value > 0.5 ? 1 : 0;
