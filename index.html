@@ -5,6 +5,7 @@
     <title>Time Sense</title>
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/moment/moment.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chroma-js/chroma.min.js"></script>
     <script>
       const dataset = [];
     </script>
@@ -148,11 +149,16 @@
               const startTime = moment(period.start);
               const endTime = moment(period.end);
               const value = (this.now - startTime) / (endTime - startTime);
+              const saturatedValue = Math.max(0, Math.min(1, value));
               const r1 = r2 - w;
+              const hueMin = chroma('#ff0000').get('lch.h');
+              const hueMax = chroma('#0000ff').get('lch.h');
+              const fillColor = chroma.lch(50, 100, (hueMax - hueMin) * (1 - saturatedValue) + hueMin);
               arcs.push({
                 value: value,
                 r1: r1,
                 r2: r2,
+                fillColor: fillColor,
                 fontSize: fontSize,
                 pathId: `path-${i}`,
                 label: period.label,
@@ -181,6 +187,7 @@
               v-bind:value="arc.value"
               v-bind:r1="arc.r1"
               v-bind:r2="arc.r2"
+              v-bind:fill-color="arc.fillColor"
               v-bind:font-size="arc.fontSize"
               v-bind:path-id="arc.pathId"
               v-bind:label="arc.label"
@@ -194,6 +201,7 @@
           'value',
           'r1',
           'r2',
+          'fill-color',
           'font-size',
           'path-id',
           'label',
@@ -227,7 +235,7 @@
             <path
               v-bind:d="d"
               v-bind:id="pathId"
-              fill="tomato"
+              v-bind:fill="fillColor"
               fill-opacity="0.5"
               />
             <text dx="0.1em" dy="-0.1em" v-bind:font-size="fontSize">
